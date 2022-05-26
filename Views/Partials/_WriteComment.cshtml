@@ -1,0 +1,55 @@
+﻿
+@using Microsoft.AspNetCore.Identity
+@using Facebook.DataBaseContext
+
+@inject UserManager<CustomUserFields> UserManager
+
+@{
+
+    var user = UserManager.FindByNameAsync(User.Identity.Name).Result;
+
+}
+
+<form asp-controller="Post" asp-action="UserComment" asp-route-postID="@ViewBag.postID" method="post">
+
+    <!-- Modal -->
+    <div class="modal fade" id="PostComment_@ViewBag.postID" tabindex="-1" role="dialog" aria-labelledby="PostCommentTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="PostCommentTitle">Comment (s)</h5>
+
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+
+                    <textarea name="Comment" rows="3" id="commentTextArea_@ViewBag.postID" class="form-control" placeholder="Hi @user.FirstName! Write a comment..."></textarea>
+
+                </div>
+
+                <div class="modal-footer">
+
+                    <button type="submit" id="commentTextButton_@ViewBag.postID" class="btn btn-block btn-primary" disabled="disabled">Done</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<script>
+
+    $(document).ready(function () {
+
+        $('#commentTextArea_@ViewBag.postID').on('input change', function () {
+            if ($(this).val() != '') {
+                $('#commentTextButton_@ViewBag.postID').prop('disabled', false);
+            } else {
+                $('#commentTextButton_@ViewBag.postID').prop('disabled', true);
+            }
+        });
+
+    });
+</script>
+

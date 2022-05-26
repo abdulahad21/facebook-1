@@ -1,0 +1,68 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using Facebook.DataBaseContext
+@model Facebook.Models.RegisterModel
+
+@inject UserManager<CustomUserFields> UserManager
+
+@{
+
+    var user = UserManager.FindByNameAsync(User.Identity.Name).Result;
+
+}
+
+<form asp-controller="Account" asp-action="EditUserAccount" method="post">
+
+    <!-- Modal -->
+    <div class="modal fade" id="EditUserAccount" tabindex="-1" role="dialog" aria-labelledby="EditUserAccountTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="EditUserAccountTitle">Edit User Account Details</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label asp-for="FirstName" class="control-label"></label>
+                                <input asp-for="FirstName" value="@user.FirstName" class="form-control" />
+                                <span asp-validation-for="FirstName" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label asp-for="LastName" class="control-label"></label>
+                                <input asp-for="LastName" value="@user.LastName" class="form-control" />
+                                <span asp-validation-for="LastName" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label asp-for="Email" class="control-label"></label>
+                                <input value="@user.Email" disabled class="form-control" />
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label asp-for="Mobile" class="control-label"></label>
+                                <input asp-for="Mobile" value="@user.PhoneNumber" class="form-control" />
+                                <span asp-validation-for="Mobile" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-block btn-primary">Done</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+

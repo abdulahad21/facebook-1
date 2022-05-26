@@ -1,0 +1,135 @@
+﻿@model IEnumerable<Facebook.Models.PostModel>
+@using Microsoft.AspNetCore.Identity
+@using Facebook.DataBaseContext
+@using Microsoft.EntityFrameworkCore
+@inject UserManager<CustomUserFields> UserManager
+@inject DbContextOptions<CommentContext> _context;
+
+@{
+    var user = UserManager.FindByNameAsync(User.Identity.Name).Result;
+    ViewData["Title"] = user.FirstName;
+    var postQty = Model.Where(x => x.Email == user.Email).ToList().Count;
+    var _commentContext = new CommentContext(_context);
+    var comments = await _commentContext.Comments.ToListAsync();
+}
+
+<div class="row mx-5">
+    <div class="col-12 text-center pb-3">
+
+        <img class="display-4" width="301" height="106" src="https://static.xx.fbcdn.net/rsrc.php/y8/r/dF5SId3UHWd.svg" alt="Facebook">
+        <h5>Facebook helps you connect and share with the people in your life.</h5>
+
+    </div>
+    <div class="col-md-4 py-3">
+        <div class="border p-4 rounded">
+            <h4>
+                <span class="badge badge-pill badge-primary">Profile</span>
+                <a class="badge badge-pill badge-primary text-white" data-toggle="modal" data-target="#EditUserAccount" style="cursor: pointer;">Edit</a>
+            </h4>
+            <h5>Name: @user.FirstName @user.LastName</h5>
+            <h5>Email: @user.Email</h5>
+            <h5>Phone: @user.PhoneNumber</h5>
+            <h5>Total Post (s): @postQty</h5>
+        </div>
+    </div>
+
+    <div class="col-md-8 py-3" id="PostGrid">
+
+        @await Html.PartialAsync("~/Views/Partials/_PostBox.cshtml")
+
+
+        @{
+            foreach (var post in Model.Reverse())
+            {
+                if (post.Email == user.Email)
+                {
+                    <div class="my-3">
+                        <div class="card">
+                            <div class="card-body">
+
+                                @{
+                                    var postID = post.Id;
+                                    var commentNo = "comment" + post.Id;
+                                    var commentsQty = comments.Where(x => x.PostID == post.Id).Count();
+                                }
+
+                                <div class="row">
+                                    <div class="col-6">
+                                        <h5 class="card-title">@post.FirstName @post.LastName</h5>
+                                    </div>
+                                    <div class="col-6 text-right">
+                                        <i class="fa-solid fa-ellipsis fa-2x" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="cursor: pointer;"></i>
+                                        <div class="dropdown-menu dropdown-menu-right">
+                                            <a class="dropdown-item" asp-controller="Post" asp-action="EditPost" asp-route-id="@post.Id"> Edit Post</a>
+                                            <a class="dropdown-item" asp-controller="Post" asp-action="DeletePost" asp-route-id="@post.Id">Delete Post</a>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                                <h6 class="card-subtitle mb-2 text-muted">@post.PostDateTime</h6>
+
+                                <hr />
+
+
+                                <p style="white-space: pre-line;" class="card-text" id="@postID">
+                                    @post.Post
+                                </p>
+
+                                @*setting text alignment | English - Urdu - Arabic*@
+                                <script>
+
+                                    var text = document.getElementById("@postID");
+                                    var ifUrduText = s => (/[\u0600-\u06FF]/.test(s[0]));
+
+                                    if (ifUrduText(text.innerText.replace(/[^a-zA-Z \u0600-\u06FF ]/g, '').trim())) {
+                                        text.classList.add("userPost")
+                                    }
+
+                                </script>
+
+                                <hr />
+
+                                <!-- trigger modal -->
+                                <input type="text" class="form-control rounded-pill" style="cursor: pointer; color: transparent" data-toggle="modal" data-target="#PostComment_@postID" placeholder="Hi @user.FirstName! Write a comment...">
+
+                                @await Html.PartialAsync("~/Views/Partials/_WriteComment.cshtml", null, new ViewDataDictionary(ViewData) { { "postID", postID } })
+
+                                <div class="row">
+                                    <p class="offset-8 offset-lg-9 offset-md-8 pt-2 text-right" style="cursor: pointer;" onclick="toggleComment('@commentNo')">@commentsQty Comment (s)</p>
+                                </div>
+
+                                @*comments*@
+                                @{
+                                    if (commentsQty > 0)
+                                    {
+                                        <div class="card bg-light" style="display:none" id="@commentNo">
+                                            <div class="card-body">
+                                                @{
+                                                    foreach (var comment in comments)
+                                                    {
+                                                        if (post.Id == comment.PostID)
+                                                        {
+                                                            <h5>@comment.FirstName</h5>
+                                                            <p>@comment.Comment</p>
+                                                        }
+                                                    }
+                                                }
+                                            </div>
+                                        </div>
+                                    }
+                                }
+
+                            </div>
+                        </div>
+                    </div>
+                }
+
+            }
+        }
+    </div>
+</div>
+
+@*Edit User Account Details*@
+@await Html.PartialAsync("~/Views/Partials/_EditUserAccount.cshtml", new Facebook.Models.RegisterModel())
+

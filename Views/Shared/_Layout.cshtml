@@ -1,0 +1,118 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using Facebook.DataBaseContext
+@inject UserManager<CustomUserFields> UserManager
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    @{
+        ViewData["Title"] = (ViewData["Title"] is "Home") ? "Facebook" : ViewData["Title"] + " - Facebook";
+
+    }
+
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" integrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <link rel="stylesheet" href="~/css/site.css" />
+    <link rel="shortcut icon" type="image/x-icon" href="https://www.Facebook.com/images/fb_icon_325x325.png">
+</head>
+<body>
+    <header>
+        <nav class="navbar fixed-top navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+            <div class="container">
+                @if (User.Identity.IsAuthenticated)
+                {
+                    <a aria-label="Facebook" class="navbar-brand text-primary" asp-area="" asp-controller="Home" asp-action="Index"><i class="fa-brands fa-facebook fa-2x"></i></a>
+
+                }
+                else
+                {
+                    <div class="navbar-brand text-primary"></div>
+
+                }
+
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="navbar-collapse collapse d-sm-inline-flex flex-sm-row-reverse">
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        var user = UserManager.FindByNameAsync(User.Identity.Name).Result;
+
+                        <ul class="navbar-nav flex-grow-1">
+                            <li class="nav-item">
+                                <!-- Facebook search box -->
+                                <div class="has-search">
+                                    <span class="fa fa-search form-control-feedback"></span>
+                                    <input type="text" class="form-control rounded-pill" placeholder="Search Facebook">
+                                </div>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Profile">@user.FirstName</a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a href="#" class="nav-link text-dark" data-toggle="modal" data-target="#facebookPost">Write</a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Logout">Logout</a>
+                            </li>
+
+                        </ul>
+
+                    }
+                    else
+                    {
+                        <ul class="navbar-nav flex-grow-1">
+
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Register">Register</a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Login">Login</a>
+                            </li>
+                        </ul>
+                    }
+                </div>
+
+            </div>
+        </nav>
+    </header>
+
+    <div class="container pt-5">
+        <main role="main" class="py-3">
+            @RenderBody()
+
+        </main>
+    </div>
+
+    <footer class="border-top footer text-muted">
+        <!-- Back to top button -->
+        <i type="button" title="Go to top"
+           class="fa-solid fa-circle-up fa-3x text-info"
+           id="btn-back-to-top">
+        </i>
+        <div class="container">
+            &copy; 2022 - FacebookApp
+
+        </div>
+    </footer>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+   
+</body>
+</html>

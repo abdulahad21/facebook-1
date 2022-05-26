@@ -1,0 +1,56 @@
+﻿@model Facebook.Models.LoginModel
+@{ ViewData["Title"] = "Login"; }
+
+
+<h4 class="mt-5 text-center">Login to Facebook</h4>
+
+<hr />
+
+
+<form asp-action="Login" method="post">
+
+    <div class="row">
+
+        <div class="col-md-6">
+            <img class="" width="301" height="106" src="https://static.xx.fbcdn.net/rsrc.php/y8/r/dF5SId3UHWd.svg" alt="Facebook">
+            <h5>Facebook helps you connect and share with the people in your life.</h5>
+        </div>
+
+        <div class="col-md-6">
+            <div class="form-group">
+                <label asp-for="Email" class="control-label"></label>
+                <input asp-for="Email" class="form-control" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Password" class="control-label"></label>
+                <input asp-for="Password" class="form-control" />
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <div class="custom-control custom-checkbox">
+                    <input asp-for="RememberMe" type="checkbox" class="custom-control-input">
+                    <label class="custom-control-label" asp-for="RememberMe">@Html.DisplayNameFor(m => m.RememberMe)</label>
+                </div>
+
+            </div>
+
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="form-group text-center">
+                <input type="submit" value="Login" class="btn btn-block btn-primary" />
+            </div>
+
+            <div class="text-center">
+                <a asp-action="Register">Sign up for Facebook</a>
+            </div>
+        </div>
+
+
+    </div>
+</form>
+
+
+

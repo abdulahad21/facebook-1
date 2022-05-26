@@ -1,0 +1,76 @@
+﻿@model Facebook.Models.RegisterModel
+@{ ViewData["Title"] = "Register"; }
+
+<div class="row">
+    <div class="text-center col-md-4">
+        <img class="" width="301" height="106" src="https://static.xx.fbcdn.net/rsrc.php/y8/r/dF5SId3UHWd.svg" alt="Facebook">
+    </div>
+    <div class="col-md-6">
+        <h4 class="mt-5">Create a new account</h4>
+        <p>It's quick and easy.</p>
+    </div>
+</div>
+
+<hr />
+
+
+<form asp-action="Register" method="post">
+    
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label asp-for="FirstName" class="control-label"></label>
+                <input asp-for="FirstName" class="form-control" />
+                <span asp-validation-for="FirstName" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label asp-for="LastName" class="control-label"></label>
+                <input asp-for="LastName" class="form-control" />
+                <span asp-validation-for="LastName" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label asp-for="Email" class="control-label"></label>
+                <input asp-for="Email" class="form-control" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label asp-for="Mobile" class="control-label"></label>
+                <input asp-for="Mobile" class="form-control" />
+                <span asp-validation-for="Mobile" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label asp-for="Password" class="control-label"></label>
+                <input asp-for="Password" class="form-control" />
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label asp-for="ConfirmPassword" class="control-label"></label>
+                <input asp-for="ConfirmPassword" class="form-control" />
+                <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+            </div>
+        </div>
+
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+        <div class="form-group col-12 text-center">
+            <input type="submit" value="Sign Up" class="btn btn-block btn-success" />
+        </div>
+    </div>
+</form>
+
+
+<div class="text-center">
+    <a asp-action="Login">Already have an account?</a>
+</div>
+
+

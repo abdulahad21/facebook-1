@@ -1,0 +1,101 @@
+﻿@model IEnumerable<Facebook.Models.PostModel>
+@using Microsoft.AspNetCore.Identity
+@using Facebook.DataBaseContext
+@using Microsoft.EntityFrameworkCore
+@inject UserManager<CustomUserFields> UserManager
+@inject DbContextOptions<CommentContext> _context;
+
+@{
+    var user = UserManager.FindByNameAsync(User.Identity.Name).Result;
+    ViewData["Title"] = "Home";
+    var _commentContext = new CommentContext(_context);
+    var comments = await _commentContext.Comments.ToListAsync();
+}
+
+<div class="row mx-5">
+    <div class="col-12 text-center pb-3">
+
+        <img class="display-4" width="301" height="106" src="https://static.xx.fbcdn.net/rsrc.php/y8/r/dF5SId3UHWd.svg" alt="Facebook">
+        <h5>Facebook helps you connect and share with the people in your life.</h5>
+
+    </div>
+
+    <div class="offset-1 col-md-10 py-3">
+
+        @await Html.PartialAsync("~/Views/Partials/_PostBox.cshtml")
+
+
+        @{
+            foreach (var post in Model.Reverse())
+            {
+                <div class="my-3">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">@post.FirstName @post.LastName</h5>
+                            <h6 class="card-subtitle mb-2 text-muted">@post.PostDateTime</h6>
+
+                            <hr />
+
+                            @{
+                                var postID = post.Id;
+                                var commentNo = "comment" + post.Id;
+                                var commentsQty = comments.Where(x => x.PostID == postID).Count();
+                            }
+
+                            <p style="white-space: pre-line;" class="card-text" id="@postID">
+                                @post.Post
+                            </p>
+
+                            <hr />
+
+                            <!-- trigger modal -->
+                            <input type="text" class="form-control rounded-pill" style="cursor: pointer; color: transparent" data-toggle="modal" data-target="#PostComment_@postID" placeholder="Hi @user.FirstName! Write a comment...">
+
+                            @await Html.PartialAsync("~/Views/Partials/_WriteComment.cshtml", null, new ViewDataDictionary(ViewData) { { "postID", postID } })
+
+                            <div class="row">
+                                <p class="offset-8 offset-lg-10 pt-2 text-right" style="cursor: pointer;" onclick="toggleComment('@commentNo')">@commentsQty Comment (s)</p>
+                            </div>
+
+                            @*comments*@
+                            @{
+                                if (commentsQty > 0)
+                                {
+                                    <div class="card bg-light" style="display:none" id="@commentNo">
+                                        <div class="card-body">
+                                            @{
+                                                foreach (var comment in comments)
+                                                {
+                                                    if (postID == comment.PostID)
+                                                    {
+                                                        <h5>@comment.FirstName</h5>
+                                                        <p>@comment.Comment</p>
+                                                    }
+                                                }
+                                            }
+                                        </div>
+                                    </div>
+                                }
+                            }
+
+                        </div>
+                    </div>
+                </div>
+
+                @*setting text alignment | English - Urdu - Arabic*@
+                <script>
+
+                    var text = document.getElementById("@postID");
+                    var ifUrduText = s => (/[\u0600-\u06FF]/.test(s[0]));
+
+                     if (ifUrduText(text.innerText.replace(/[^a-zA-Z \u0600-\u06FF ]/g, '').trim())) {
+
+                         text.classList.add("userPost")
+                    }
+                </script>
+            }
+        }
+
+    </div>
+</div>
+

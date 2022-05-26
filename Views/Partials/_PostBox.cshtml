@@ -1,0 +1,27 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using Facebook.DataBaseContext
+
+@inject UserManager<CustomUserFields> UserManager
+
+@{
+
+    var user = UserManager.FindByNameAsync(User.Identity.Name).Result;
+
+
+}
+
+<div class="card">
+    <h5 class="modal-header">
+        Hi @user.FirstName!
+    </h5>
+    <div class="card-body">
+
+        <!-- trigger modal -->
+        <input type="text" class="form-control rounded-pill" style="cursor: pointer; color: transparent" data-toggle="modal" data-target="#facebookPost" placeholder="What&#x27;s on your mind, @user.FirstName?">
+
+    </div>
+</div>
+
+
+@await Html.PartialAsync("~/Views/Partials/_WritePost.cshtml", new Facebook.Models.PostModel())
+
