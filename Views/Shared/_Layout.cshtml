@@ -47,11 +47,17 @@
                         <ul class="navbar-nav flex-grow-1">
                             <li class="nav-item">
                                 <!-- Facebook search box -->
-                                <div class="has-search">
-                                    <span class="fa fa-search form-control-feedback"></span>
-                                    <input type="text" class="form-control rounded-pill" placeholder="Search Facebook">
-                                </div>
+                                <form asp-controller="Account" asp-action="SearchUser" method="post">
+                                    <div class="d-flex justify-content-start">
+                                        <div class="has-search">
+                                            <span class="fa fa-search form-control-feedback"></span>
+                                            <input name="strToSearch" id="searchTextArea" type="search" class="form-control rounded-pill" placeholder="Search Facebook">
+                                        </div>
+                                        <input type="submit" id="searchtButton" class="mx-4 btn btn-info d-none" name="name" value="Search" disabled="disabled" />
+                                    </div>
+                                </form>
                             </li>
+
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                             </li>
@@ -113,6 +119,6 @@
     <script src="~/js/site.js" asp-append-version="true"></script>
     <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
     <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
-   
+
 </body>
 </html>

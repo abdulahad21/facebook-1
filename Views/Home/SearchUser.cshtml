@@ -1,0 +1,31 @@
+﻿@model IEnumerable<Facebook.Models.SearchUserModel>
+@using Microsoft.AspNetCore.Identity
+@using Facebook.DataBaseContext
+@inject UserManager<CustomUserFields> UserManager
+
+@{
+    var user = UserManager.FindByNameAsync(User.Identity.Name).Result;
+    ViewData["Title"] = "You Searched";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+@{
+    if (Model.Count() == 0)
+    {
+        <h1 class="text-center mt-5 text-danger">No searches found</h1>
+    }
+    else
+    {
+        <div class="container mt-5 pl-3">
+            @{
+                foreach (var item in Model)
+                {
+                        <a href="#">@item.FirstName @item.LastName</a>
+                    <br />
+                }
+            }
+        </div>
+    }
+}
+

@@ -9,6 +9,7 @@ using Facebook.DataBaseContext;
 using Facebook.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
+using System.Text.RegularExpressions;
 
 namespace Facebook.Controllers
 {
@@ -174,6 +175,61 @@ namespace Facebook.Controllers
 
 
             return RedirectToAction("Profile", "Home");
+        }
+
+        // GET: Account/SearchUser/string
+        public async Task<IActionResult> SearchUser(string strToSearch)
+        {
+            var users = await _userContext.AspNetUsers.ToListAsync();
+            List<SearchUserModel> usersMatched = new List<SearchUserModel>();
+            
+            if (strToSearch != null)
+            {
+                foreach (var user in users)
+                {
+                    if (user.Email == User.Identity.Name)
+                    {
+                        continue;
+                    }
+
+                    if (StringMatched(strToSearch, user.FirstName) || StringMatched(strToSearch, user.LastName) || user.Email == strToSearch || user.PhoneNumber == strToSearch)
+                    {
+                        bool isAdded = true;
+
+                        if (usersMatched.Count > 0)
+                        {
+                            foreach (var item in usersMatched)
+                            {
+                                if (item.Email == user.Email)
+                                {
+                                    isAdded = false;
+                                    continue;
+                                }
+                            }
+                        }
+
+                        if (isAdded)
+                        {
+                            SearchUserModel searchUser = new SearchUserModel();
+                            searchUser.Email = user.Email;
+                            searchUser.FirstName = user.FirstName;
+                            searchUser.LastName = user.LastName;
+                            searchUser.Phone = user.PhoneNumber;
+
+                            usersMatched.Add(searchUser);
+                        }
+                        
+                    }
+                }
+            }
+
+            return View("~/Views/Home/SearchUser.cshtml", usersMatched);
+        }
+
+        //to check if string contains given string or not
+        private bool StringMatched(string strToSearch, string str)
+        {
+            return Regex.IsMatch(strToSearch, Regex.Escape(str), RegexOptions.IgnoreCase);
         }
 
     }

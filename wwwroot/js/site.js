@@ -23,6 +23,14 @@ $(document).ready(function () {
         }
     });
 
+    $('#searchTextArea').on('input change', function () {
+        if ($(this).val() != '') {
+            $('#searchtButton').prop('disabled', false);
+        } else {
+            $('#searchtButton').prop('disabled', true);
+        }
+    });
+
 });
 
 //back to top
