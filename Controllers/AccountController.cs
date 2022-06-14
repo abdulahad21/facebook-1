@@ -226,6 +226,11 @@ namespace Facebook.Controllers
             return View("~/Views/Home/SearchUser.cshtml", usersMatched);
         }
 
+        public async Task<IActionResult> Profile(string email)
+        {
+            return View("~/Views/Home/UserProfile.cshtml", await _postContext.Posts.Where(x => x.Email == email).ToListAsync());
+        }
+
         //to check if string contains given string or not
         private bool StringMatched(string strToSearch, string str)
         {
