@@ -1,6 +1,10 @@
 ﻿@using Microsoft.AspNetCore.Identity
 @using Facebook.DataBaseContext
 @inject UserManager<CustomUserFields> UserManager
+
+@{
+    DateTime now = DateTime.Now;
+}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -110,7 +114,7 @@
            id="btn-back-to-top">
         </i>
         <div class="container">
-            &copy; 2022 - FacebookApp
+            &copy; @now.Year - FacebookApp
 
         </div>
     </footer>
