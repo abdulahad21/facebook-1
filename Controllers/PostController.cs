@@ -1,12 +1,18 @@
 ﻿using Facebook.DataBaseContext;
 using Facebook.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Text;
 using System.Threading.Tasks;
 
 
@@ -29,7 +35,7 @@ namespace Facebook.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> UserPost(PostModel userPost)
+        public async Task<IActionResult> UserPost(PostModel userPost, IFormFile image)
         {
             var currentUser = _userManager.FindByNameAsync(User.Identity.Name).Result;
 
@@ -38,8 +44,54 @@ namespace Facebook.Controllers
             userPost.Email = currentUser.Email;
             userPost.PostDateTime = DateTime.Now;
 
+            if (image != null)
+            {
+                byte[] imageBytes = GetImageBytes(image);
+
+                // Create an HTTP client and set the content type to image/jpeg
+                HttpClient client = new HttpClient();
+                // Create a new HttpRequestMessage
+                var request = new HttpRequestMessage(HttpMethod.Post, "http://127.0.0.1:5000/api/face_detection");
+
+                // Create an HttpContent object representing the image data and set the Content-Type header
+                var content = new ByteArrayContent(imageBytes);
+                content.Headers.ContentType = new MediaTypeHeaderValue("image/jpeg");
+
+                // Set the request's Content property to the HttpContent object
+                request.Content = content;
+
+                var response = await client.SendAsync(request);
+
+                // Read the response from the API
+                var responseString = await response.Content.ReadAsStringAsync();
+
+                // Deserialize the JSON response
+                var responseMsg = JsonConvert.DeserializeObject<ResponseMsg>(responseString);
+                string resMsg = responseMsg.Result;
+                int code = responseMsg.Code;
+
+                if (response.IsSuccessStatusCode)
+                {
+                    if (code == 0)
+                    {
+                        // Upload image to any cload Storage
+                        // Save Image Path to Database
+                    }
+                    else
+                    {
+                        // Use this message to warn this user that image contains faces
+                        TempData["Warning"] = resMsg;
+                    }
+                }
+                else
+                {
+                    TempData["Error"] = resMsg;
+                }
+
+            }
+
             _postContext.Add(userPost);
-            await _postContext.SaveChangesAsync();
+            //await _postContext.SaveChangesAsync();
 
             var url = Request.Headers["Referer"];
 
@@ -124,5 +176,22 @@ namespace Facebook.Controllers
 
             return RedirectToAction("Profile", "Home");
         }
+
+        // to convert image to byte array
+        private static byte[] GetImageBytes(IFormFile image)
+        {
+            using (var memoryStream = new MemoryStream())
+            {
+                image.CopyTo(memoryStream);
+                return memoryStream.ToArray();
+            }
+        }
+    }
+
+    // Class to deserialize the JSON response for face detection API
+    class ResponseMsg
+    {
+        public string Result { get; set; }
+        public int Code { get; set; }
     }
 }
