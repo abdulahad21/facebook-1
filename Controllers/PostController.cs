@@ -76,6 +76,14 @@ namespace Facebook.Controllers
                     {
                         // Upload image to any cload Storage
                         // Save Image Path to Database
+                        string folder = "Images/";
+                        folder += Guid.NewGuid().ToString() + "_" + image.FileName;
+
+                        using (var stream = new FileStream(folder, FileMode.Create))
+                        {
+                            await image.CopyToAsync(stream);
+                        }
+                        userPost.File_Path = folder;
                     }
                     else
                     {
@@ -91,7 +99,7 @@ namespace Facebook.Controllers
             }
 
             _postContext.Add(userPost);
-            //await _postContext.SaveChangesAsync();
+            await _postContext.SaveChangesAsync();
 
             var url = Request.Headers["Referer"];
 

@@ -27,5 +27,7 @@ namespace Facebook.Models
         [Display(Name = "Post: ")]
         public string Post { get; set; }
 
+        public string File_Path { get; set; }
+
     }
 }
