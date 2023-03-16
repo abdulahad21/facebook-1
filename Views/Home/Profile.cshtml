@@ -13,7 +13,7 @@
     var comments = await _commentContext.Comments.ToListAsync();
 
     string Warning = TempData["Warning"]?.ToString() ?? "";
-    string Error = TempData["Error"]?.ToString() ?? "";
+    //string Error = TempData["Error"]?.ToString() ?? "";
 }
 
 <div class="row mx-5">
@@ -48,15 +48,7 @@
                     </button>
                 </div>
             }
-            else if (!string.IsNullOrWhiteSpace(Error))
-            {
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    <strong>Error</strong> <p>@Error</p>
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-            }
+            
         }
 
         @await Html.PartialAsync("~/Views/Partials/_PostBox.cshtml")
@@ -186,7 +178,7 @@
     function translate(target_language, postID) {
         var text = $('#' + postID).text();
         $.ajax({
-            url: 'http://127.0.0.1:5000/translate',
+            url: 'http://127.0.0.1:5000/api/translate',
             type: 'POST',
             data: JSON.stringify({ text: text, language: target_language }),
             contentType: 'application/json; charset=utf-8',

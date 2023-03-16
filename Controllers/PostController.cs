@@ -47,58 +47,66 @@ namespace Facebook.Controllers
 
             if (image != null)
             {
-                byte[] imageBytes = GetImageBytes(image);
-
-                // Create an HTTP client and set the content type to image/jpeg
-                HttpClient client = new HttpClient();
-                // Create a new HttpRequestMessage
-                var request = new HttpRequestMessage(HttpMethod.Post, "http://127.0.0.1:5000/api/face_detection");
-
-                // Create an HttpContent object representing the image data and set the Content-Type header
-                var content = new ByteArrayContent(imageBytes);
-                content.Headers.ContentType = new MediaTypeHeaderValue("image/jpeg");
-
-                // Set the request's Content property to the HttpContent object
-                request.Content = content;
-
-                var response = await client.SendAsync(request);
-
-                // Read the response from the API
-                var responseString = await response.Content.ReadAsStringAsync();
-
-                // Deserialize the JSON response
-                var responseMsg = JsonConvert.DeserializeObject<ResponseMsg>(responseString);
-                string resMsg = responseMsg.Result;
-                int code = responseMsg.Code;
-
-                if (response.IsSuccessStatusCode)
+                try
                 {
-                    if (code == 0)
+                    byte[] imageBytes = GetImageBytes(image);
+
+                    // Create an HTTP client and set the content type to image/jpeg
+                    HttpClient client = new HttpClient();
+                    // Create a new HttpRequestMessage
+                    var request = new HttpRequestMessage(HttpMethod.Post, "http://127.0.0.1:5000/api/face_detection");
+
+                    // Create an HttpContent object representing the image data and set the Content-Type header
+                    var content = new ByteArrayContent(imageBytes);
+                    content.Headers.ContentType = new MediaTypeHeaderValue("image/jpeg");
+
+                    // Set the request's Content property to the HttpContent object
+                    request.Content = content;
+
+                    var response = await client.SendAsync(request);
+
+                    // Read the response from the API
+                    var responseString = await response.Content.ReadAsStringAsync();
+
+                    // Deserialize the JSON response
+                    var responseMsg = JsonConvert.DeserializeObject<ResponseMsg>(responseString);
+                    string resMsg = responseMsg.Result;
+                    int code = responseMsg.Code;
+
+                    if (response.IsSuccessStatusCode)
                     {
-                        // Upload image to wwwroot/Images
-                        // Save Image Path to Database
-                        var fileName = Path.GetFileName(image.FileName);
-                        var path = Path.Combine(
-                            Directory.GetCurrentDirectory(), "wwwroot", "Images", fileName);
-                        using (var stream = new FileStream(path, FileMode.Create))
+                        if (code == 0)
                         {
-                            image.CopyTo(stream);
+                            // Upload image to wwwroot/Images
+                            // Save Image Path to Database
+                            var fileName = Path.GetFileName(image.FileName);
+                            var path = Path.Combine(
+                                Directory.GetCurrentDirectory(), "wwwroot", "Images", fileName);
+                            using (var stream = new FileStream(path, FileMode.Create))
+                            {
+                                image.CopyTo(stream);
+                            }
+
+                            var imagePath = "/Images/" + fileName;
+                            userPost.ImagePath = imagePath;
+                            userPost.ImageName = fileName;
                         }
-                                                
-                        var imagePath = "/Images/" + fileName;
-                        userPost.ImagePath= imagePath;
-                        userPost.ImageName = fileName;
+                        else
+                        {
+                            // Use this message to warn this user that image contains faces
+                            TempData["Warning"] = resMsg;
+                            return Redirect(url);
+                        }
                     }
                     else
                     {
-                        // Use this message to warn this user that image contains faces
                         TempData["Warning"] = resMsg;
                         return Redirect(url);
                     }
                 }
-                else
+                catch (Exception ex)
                 {
-                    TempData["Error"] = resMsg;
+                    TempData["Warning"] = ex.Message;
                     return Redirect(url);
                 }
 
@@ -106,8 +114,6 @@ namespace Facebook.Controllers
 
             _postContext.Add(userPost);
             await _postContext.SaveChangesAsync();
-
-            
 
             return Redirect(url);
         }
