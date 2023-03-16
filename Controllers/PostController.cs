@@ -38,6 +38,7 @@ namespace Facebook.Controllers
         public async Task<IActionResult> UserPost(PostModel userPost, IFormFile image)
         {
             var currentUser = _userManager.FindByNameAsync(User.Identity.Name).Result;
+            var url = Request.Headers["Referer"];
 
             userPost.FirstName = currentUser.FirstName;
             userPost.LastName = currentUser.LastName;
@@ -74,26 +75,39 @@ namespace Facebook.Controllers
                 {
                     if (code == 0)
                     {
-                        // Upload image to any cload Storage
+                        // Upload image to wwwroot/Images
                         // Save Image Path to Database
+                        var fileName = Path.GetFileName(image.FileName);
+                        var path = Path.Combine(
+                            Directory.GetCurrentDirectory(), "wwwroot", "Images", fileName);
+                        using (var stream = new FileStream(path, FileMode.Create))
+                        {
+                            image.CopyTo(stream);
+                        }
+                                                
+                        var imagePath = "/Images/" + fileName;
+                        userPost.ImagePath= imagePath;
+                        userPost.ImageName = fileName;
                     }
                     else
                     {
                         // Use this message to warn this user that image contains faces
                         TempData["Warning"] = resMsg;
+                        return Redirect(url);
                     }
                 }
                 else
                 {
                     TempData["Error"] = resMsg;
+                    return Redirect(url);
                 }
 
             }
 
             _postContext.Add(userPost);
-            //await _postContext.SaveChangesAsync();
+            await _postContext.SaveChangesAsync();
 
-            var url = Request.Headers["Referer"];
+            
 
             return Redirect(url);
         }

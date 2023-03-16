@@ -10,7 +10,15 @@
     ViewData["Title"] = "Home";
     var _commentContext = new CommentContext(_context);
     var comments = await _commentContext.Comments.ToListAsync();
+
+    string Warning = TempData["Warning"]?.ToString() ?? "";
+    string Error = TempData["Error"]?.ToString() ?? "";
+
 }
+
+
+
+
 
 <div class="row mx-5">
     <div class="col-12 text-center pb-3">
@@ -22,8 +30,28 @@
 
     <div class="offset-1 col-md-10 py-3">
 
-        @await Html.PartialAsync("~/Views/Partials/_PostBox.cshtml")
+        @{
+            if (!string.IsNullOrWhiteSpace(Warning))
+            {
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <strong>Warning</strong> <p>@Warning</p>
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            }
+            else if (!string.IsNullOrWhiteSpace(Error))
+            {
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <strong>Error</strong> <p>@Error</p>
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            }
+        }
 
+        @await Html.PartialAsync("~/Views/Partials/_PostBox.cshtml")
 
         @{
             foreach (var post in Model.Reverse())
@@ -42,9 +70,12 @@
                                 var commentsQty = comments.Where(x => x.PostID == postID).Count();
                             }
 
-                            <p style="white-space: pre-line;" class="card-text" id="@postID">
-                                @post.Post
-                            </p>
+                            <divv style="max-width: 100%;">
+                                <p style="white-space: pre-line;" class="card-text" id="@postID">
+                                    @post.Post
+                                </p>
+                                <img src="@Url.Content(post.ImagePath)" alt="@post.ImageName" style="max-width: 100%;" />
+                            </divv>
 
                             <hr />
 
@@ -88,9 +119,9 @@
                     var text = document.getElementById("@postID");
                     var ifUrduText = s => (/[\u0600-\u06FF]/.test(s[0]));
 
-                     if (ifUrduText(text.innerText.replace(/[^a-zA-Z \u0600-\u06FF ]/g, '').trim())) {
+                    if (ifUrduText(text.innerText.replace(/[^a-zA-Z \u0600-\u06FF ]/g, '').trim())) {
 
-                         text.classList.add("userPost")
+                        text.classList.add("userPost")
                     }
                 </script>
             }
