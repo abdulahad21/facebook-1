@@ -99,12 +99,15 @@ body {
     border-radius: 15px;
 }
 
-/*setting text alignment | English - Urdu - Arabic*/
 .userPost {
+    font-size: 22px !important;
+}
+
+/*setting text alignment | English - Urdu - Arabic*/
+.postUrAr {
     direction: rtl !important;
     text-align: right !important;
-    font-family: "Jameel noori nastaleeq" !important;
-    font-size: 22px !important;
+    /*font-family: "Jameel noori nastaleeq" !important;*/
 }
 
 /*back to top*/
