@@ -18,13 +18,14 @@
     else
     {
         
-<div class="container mt-5 pl-3">
+<div class="container mt-5 col-8">
+    <h5>Your Searches</h5>
     @{
         foreach (var item in Model)
         {
             if (item.Email != User.Identity.Name)
             {
-                <a asp-action="Profile" asp-controller="Account" asp-route-email="@item.Email">@item.FirstName @item.LastName</a>
+                <a asp-action="Profile" asp-controller="Account" asp-route-email="@item.Email" class="text-black text-decoration-none bg-white p-3 rounded-4 w-100 d-block">@item.FirstName @item.LastName</a>
                 <br />
             }
 

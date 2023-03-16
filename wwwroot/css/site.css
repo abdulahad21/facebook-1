@@ -121,3 +121,7 @@ body {
 #btn-back-to-top:hover {
     color: lightslategray !important;
 }
+
+hr{
+    border-top: 1px solid #000;
+}

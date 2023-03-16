@@ -51,18 +51,18 @@
                     <div class="card">
                         <div class="card-body">
                             <div class="row justify-content-between">
-                                <div>
+                                <div class="col-8">
                                     <h5 class="card-title">@post.FirstName @post.LastName</h5>
                                     <h6 class="card-subtitle mb-2 text-muted">@post.PostDateTime.ToString("f")</h6>
                                 </div>
-                                <div class="row d-flex p-2">
+                                <div class="row w-auto p-2">
                                     @{
                                         string urduBtn = $"urdu-btn-{post.Id}";
                                         string arabicBtn = $"arabic-btn-{post.Id}";
                                         string englishBtn = $"english-btn-{post.Id}";
-                                        <button type="button" class="btn btn-secondary mx-2" id="@urduBtn">اردو</button>
-                                        <button type="button" class="btn btn-success mx-2" id="@arabicBtn">العربیہ</button>
-                                        <button type="button" class="btn btn-primary mx-2" id="@englishBtn">English</button>
+                                        <button type="button" class="btn btn-secondary mx-2 w-auto" id="@urduBtn">اردو</button>
+                                        <button type="button" class="btn btn-success mx-2 w-auto" id="@arabicBtn">العربیہ</button>
+                                        <button type="button" class="btn btn-primary mx-2 mr-3 w-auto" id="@englishBtn">English</button>
                                     }
                                 </div>
                             </div>
@@ -90,7 +90,7 @@
                             @await Html.PartialAsync("~/Views/Partials/_WriteComment.cshtml", null, new ViewDataDictionary(ViewData) { { "postID", postID } })
 
                             <div class="row">
-                                <p class="offset-8 offset-lg-10 pt-2 text-right" style="cursor: pointer;" onclick="toggleComment('@commentNo')">@commentsQty Comment (s)</p>
+                                <p class="text-right pt-2" style="cursor: pointer;" onclick="toggleComment('@commentNo')">@commentsQty Comment (s)</p>
                             </div>
 
                             @*comments*@
@@ -104,8 +104,10 @@
                                                 {
                                                     if (postID == comment.PostID)
                                                     {
-                                                        <h5>@comment.FirstName</h5>
-                                                        <p>@comment.Comment</p>
+                                                        <div class="bg-white mb-2 p-3 rounded-4 border">
+                                                            <h5>@comment.FirstName</h5>
+                                                            <p class="m-0">@comment.Comment</p>
+                                                        </div>
                                                     }
                                                 }
                                             }
