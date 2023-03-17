@@ -30,10 +30,11 @@
 
             </div>
             <div class="col-md-4 py-3">
-                <div class="border p-4 rounded">
+                <div class="p-4 rounded-4 bg-white">
                     <h4>
                         <span class="badge badge-pill badge-primary">Profile</span>
                     </h4>
+                    <hr>
                     <h5>Name: @user.FirstName @user.LastName</h5>
                     <h5>Email: @user.Email</h5>
                     @*<h5>Phone: @user.PhoneNumber</h5>*@
@@ -92,7 +93,7 @@
                                     @await Html.PartialAsync("~/Views/Partials/_WriteComment.cshtml", null, new ViewDataDictionary(ViewData) { { "postID", postID } })
 
                                     <div class="row">
-                                        <p class="offset-8 offset-lg-9 offset-md-8 pt-2 text-right" style="cursor: pointer;" onclick="toggleComment('@commentNo')">@commentsQty Comment (s)</p>
+                                        <p class="pt-2 text-right" style="cursor: pointer;" onclick="toggleComment('@commentNo')">@commentsQty Comment (s)</p>
                                     </div>
 
                                     @*comments*@

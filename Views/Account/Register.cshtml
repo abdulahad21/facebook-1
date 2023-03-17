@@ -5,9 +5,9 @@
     <div class="text-center col-md-4">
         <img class="" width="301" height="106" src="https://static.xx.fbcdn.net/rsrc.php/y8/r/dF5SId3UHWd.svg" alt="Facebook">
     </div>
-    <div class="col-md-6">
-        <h4 class="mt-5">Create a new account</h4>
-        <p>It's quick and easy.</p>
+    <div class="col-md-6 d-flex justify-content-center flex-column">
+        <h4 class="m-0">Create a new account</h4>
+        <p class="m-0">It's quick and easy.</p>
     </div>
 </div>
 
@@ -16,7 +16,7 @@
 
 <form asp-action="Register" method="post">
     
-    <div class="row">
+    <div class="row bg-white p-3 rounded-4 shadow mx-5 mb-3">
         <div class="col-md-6">
             <div class="form-group">
                 <label asp-for="FirstName" class="control-label"></label>
@@ -63,7 +63,7 @@
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
         <div class="form-group col-12 text-center">
-            <input type="submit" value="Sign Up" class="btn btn-block btn-success" />
+            <input type="submit" value="Sign Up" class="btn btn-success col-3 mt-3 rounded-pill" />
         </div>
     </div>
 </form>
