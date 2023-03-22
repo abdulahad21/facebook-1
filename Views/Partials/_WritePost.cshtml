@@ -25,13 +25,13 @@
                 <div class="modal-body">
                     <h5>@user.FirstName @user.LastName</h5>
 
-                    <textarea asp-for="Post" rows="10" id="postTextArea" class="form-control  border-0" placeholder="What&#x27;s on your mind, @user.FirstName?"></textarea>
+                    <textarea asp-for="Post" rows="10" id="postTextArea" class="form-control bg-light mb-3" placeholder="What&#x27;s on your mind, @user.FirstName?"></textarea>
                     <input class="form-control" type="file" name="image">
                 </div>
                 
                 <div class="modal-footer">
 
-                    <button type="submit" id="postTextButton" class="btn btn-block btn-primary" disabled="disabled">Post</button>
+                    <button type="submit" id="postTextButton" class="btn btn-block btn-primary rounded-pill" disabled="disabled">Post</button>
                 </div>
             </div>
         </div>

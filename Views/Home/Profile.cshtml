@@ -11,6 +11,9 @@
     var postQty = Model.Where(x => x.Email == user.Email).ToList().Count;
     var _commentContext = new CommentContext(_context);
     var comments = await _commentContext.Comments.ToListAsync();
+
+    string Warning = TempData["Warning"]?.ToString() ?? "";
+    //string Error = TempData["Error"]?.ToString() ?? "";
 }
 
 <div class="row mx-5">
@@ -21,11 +24,12 @@
 
     </div>
     <div class="col-md-4 py-3">
-        <div class="border p-4 rounded">
-            <h4>
-                <span class="badge badge-pill badge-primary">Profile</span>
-                <a class="badge badge-pill badge-primary text-white" data-toggle="modal" data-target="#EditUserAccount" style="cursor: pointer;">Edit</a>
+        <div class="p-4 rounded-4 bg-white">
+            <h4 class="d-flex justify-content-around">
+                <span class="badge badge-pill badge-primary col-5">Profile</span>
+                <a class="badge badge-pill badge-primary text-white col-5" data-toggle="modal" data-target="#EditUserAccount" style="cursor: pointer;">Edit</a>
             </h4>
+            <hr>
             <h5>Name: @user.FirstName @user.LastName</h5>
             <h5>Email: @user.Email</h5>
             <h5>Phone: @user.PhoneNumber</h5>
@@ -34,6 +38,19 @@
     </div>
 
     <div class="col-md-8 py-3" id="PostGrid">
+
+        @{
+            if (!string.IsNullOrWhiteSpace(Warning))
+            {
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <strong>Warning</strong> <p>@Warning</p>
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            }
+            
+        }
 
         @await Html.PartialAsync("~/Views/Partials/_PostBox.cshtml")
 
@@ -55,7 +72,22 @@
 
                                 <div class="row">
                                     <div class="col-6">
-                                        <h5 class="card-title">@post.FirstName @post.LastName</h5>
+                                        <div class="row justify-content-between">
+                                            <div>
+                                                <h5 class="card-title">@post.FirstName @post.LastName</h5>
+                                                <h6 class="card-subtitle mb-2 text-muted">@post.PostDateTime.ToString("f")</h6>
+                                            </div>
+                                            <div class="row d-flex p-2 w-auto">
+                                                @{
+                                                    string urduBtn = $"urdu-btn-{post.Id}";
+                                                    string arabicBtn = $"arabic-btn-{post.Id}";
+                                                    string englishBtn = $"english-btn-{post.Id}";
+                                                    <button type="button" class="btn btn-secondary mx-2 w-auto" id="@urduBtn">اردو</button>
+                                                    <button type="button" class="btn btn-success mx-2 w-auto" id="@arabicBtn">العربیہ</button>
+                                                    <button type="button" class="btn btn-primary mx-2 w-auto" id="@englishBtn">English</button>
+                                                }
+                                            </div>
+                                        </div>
                                     </div>
                                     <div class="col-6 text-right">
                                         <i class="fa-solid fa-ellipsis fa-2x" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="cursor: pointer;"></i>
@@ -67,24 +99,32 @@
 
                                 </div>
 
-                                <h6 class="card-subtitle mb-2 text-muted">@post.PostDateTime</h6>
-
                                 <hr />
 
+                                <divv style="max-width: 100%;">
+                                    <p style="white-space: pre-line;" class="card-text userPost" id="@postID">
+                                        @post.Post
+                                    </p>
+                                    <img src="@Url.Content(post.ImagePath)" alt="@post.ImageName" style="max-width: 100%;" />
+                                </divv>
 
-                                <p style="white-space: pre-line;" class="card-text" id="@postID">
-                                    @post.Post
-                                </p>
-
-                                @*setting text alignment | English - Urdu - Arabic*@
                                 <script>
 
-                                    var text = document.getElementById("@postID");
-                                    var ifUrduText = s => (/[\u0600-\u06FF]/.test(s[0]));
+                                    $(document).ready(function () {
+                                        //setting text alignment | English - Urdu - Arabic
+                                        setAlignment(@postID);
 
-                                    if (ifUrduText(text.innerText.replace(/[^a-zA-Z \u0600-\u06FF ]/g, '').trim())) {
-                                        text.classList.add("userPost")
-                                    }
+                                        //calling api to translate
+                                        $('#urdu-btn-@postID').click(function () {
+                                            translate('ur', @postID);
+                                        });
+                                        $('#arabic-btn-@postID').click(function () {
+                                            translate('ar', @postID);
+                                        });
+                                        $('#english-btn-@postID').click(function () {
+                                            translate('en', @postID);
+                                        });
+                                    });
 
                                 </script>
 
@@ -96,7 +136,7 @@
                                 @await Html.PartialAsync("~/Views/Partials/_WriteComment.cshtml", null, new ViewDataDictionary(ViewData) { { "postID", postID } })
 
                                 <div class="row">
-                                    <p class="offset-8 offset-lg-9 offset-md-8 pt-2 text-right" style="cursor: pointer;" onclick="toggleComment('@commentNo')">@commentsQty Comment (s)</p>
+                                    <p class="pt-2 text-right" style="cursor: pointer;" onclick="toggleComment('@commentNo')">@commentsQty Comment (s)</p>
                                 </div>
 
                                 @*comments*@
@@ -110,8 +150,10 @@
                                                     {
                                                         if (post.Id == comment.PostID)
                                                         {
-                                                            <h5>@comment.FirstName</h5>
-                                                            <p>@comment.Comment</p>
+                                                            <div class="bg-white mb-2 p-3 rounded-4 border">
+                                                                <h5>@comment.FirstName</h5>
+                                                                <p class="m-0">@comment.Comment</p>
+                                                            </div>
                                                         }
                                                     }
                                                 }
@@ -133,3 +175,41 @@
 @*Edit User Account Details*@
 @await Html.PartialAsync("~/Views/Partials/_EditUserAccount.cshtml", new Facebook.Models.RegisterModel())
 
+// Translator
+
+<script>
+    function translate(target_language, postID) {
+        var text = $('#' + postID).text();
+        $.ajax({
+            url: 'http://127.0.0.1:5000/api/translate',
+            type: 'POST',
+            data: JSON.stringify({ text: text, language: target_language }),
+            contentType: 'application/json; charset=utf-8',
+            headers: {
+                "contentType": "application/json"
+            },
+            success: function (response) {
+                $('#' + postID).text(response.translation);
+                //setting text alignment | English - Urdu - Arabic
+                setAlignment(postID);
+            },
+            error: function (xhr) {
+                console.log(xhr.responseText);
+            }
+        });
+    }
+
+    //setting text alignment | English - Urdu - Arabic
+    function setAlignment(postID) {
+        var text = document.getElementById(postID);
+        var ifUrduText = s => (/[\u0600-\u06FF]/.test(s[0]));
+
+        if (ifUrduText(text.innerText.replace(/[^a-zA-Z \u0600-\u06FF ]/g, '').trim())) {
+
+            text.classList.add("postUrAr")
+        }
+        else {
+            text.classList.remove("postUrAr")
+        }
+    }
+</script>

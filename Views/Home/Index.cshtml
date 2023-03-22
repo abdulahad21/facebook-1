@@ -10,7 +10,15 @@
     ViewData["Title"] = "Home";
     var _commentContext = new CommentContext(_context);
     var comments = await _commentContext.Comments.ToListAsync();
+
+    string Warning = TempData["Warning"]?.ToString() ?? "";
+    //string Error = TempData["Error"]?.ToString() ?? "";
+
 }
+
+
+
+
 
 <div class="row mx-5">
     <div class="col-12 text-center pb-3">
@@ -22,8 +30,19 @@
 
     <div class="offset-1 col-md-10 py-3">
 
-        @await Html.PartialAsync("~/Views/Partials/_PostBox.cshtml")
+        @{
+            if (!string.IsNullOrWhiteSpace(Warning))
+            {
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <strong>Warning</strong> <p>@Warning</p>
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            }
+        }
 
+        @await Html.PartialAsync("~/Views/Partials/_PostBox.cshtml")
 
         @{
             foreach (var post in Model.Reverse())
@@ -31,8 +50,22 @@
                 <div class="my-3">
                     <div class="card">
                         <div class="card-body">
-                            <h5 class="card-title">@post.FirstName @post.LastName</h5>
-                            <h6 class="card-subtitle mb-2 text-muted">@post.PostDateTime</h6>
+                            <div class="row justify-content-between">
+                                <div class="col-8">
+                                    <h5 class="card-title">@post.FirstName @post.LastName</h5>
+                                    <h6 class="card-subtitle mb-2 text-muted">@post.PostDateTime.ToString("f")</h6>
+                                </div>
+                                <div class="row w-auto p-2">
+                                    @{
+                                        string urduBtn = $"urdu-btn-{post.Id}";
+                                        string arabicBtn = $"arabic-btn-{post.Id}";
+                                        string englishBtn = $"english-btn-{post.Id}";
+                                        <button type="button" class="btn btn-secondary mx-2 w-auto" id="@urduBtn">اردو</button>
+                                        <button type="button" class="btn btn-success mx-2 w-auto" id="@arabicBtn">العربیہ</button>
+                                        <button type="button" class="btn btn-primary mx-2 mr-3 w-auto" id="@englishBtn">English</button>
+                                    }
+                                </div>
+                            </div>
 
                             <hr />
 
@@ -42,9 +75,12 @@
                                 var commentsQty = comments.Where(x => x.PostID == postID).Count();
                             }
 
-                            <p style="white-space: pre-line;" class="card-text" id="@postID">
-                                @post.Post
-                            </p>
+                            <divv style="max-width: 100%;">
+                                <p style="white-space: pre-line;" class="card-text userPost" id="@postID">
+                                    @post.Post
+                                </p>
+                                <img src="@Url.Content(post.ImagePath)" alt="@post.ImageName" style="max-width: 100%;" />
+                            </divv>
 
                             <hr />
 
@@ -54,7 +90,7 @@
                             @await Html.PartialAsync("~/Views/Partials/_WriteComment.cshtml", null, new ViewDataDictionary(ViewData) { { "postID", postID } })
 
                             <div class="row">
-                                <p class="offset-8 offset-lg-10 pt-2 text-right" style="cursor: pointer;" onclick="toggleComment('@commentNo')">@commentsQty Comment (s)</p>
+                                <p class="text-right pt-2" style="cursor: pointer;" onclick="toggleComment('@commentNo')">@commentsQty Comment (s)</p>
                             </div>
 
                             @*comments*@
@@ -68,8 +104,10 @@
                                                 {
                                                     if (postID == comment.PostID)
                                                     {
-                                                        <h5>@comment.FirstName</h5>
-                                                        <p>@comment.Comment</p>
+                                                        <div class="bg-white mb-2 p-3 rounded-4 border">
+                                                            <h5>@comment.FirstName</h5>
+                                                            <p class="m-0">@comment.Comment</p>
+                                                        </div>
                                                     }
                                                 }
                                             }
@@ -82,20 +120,68 @@
                     </div>
                 </div>
 
-                @*setting text alignment | English - Urdu - Arabic*@
+
                 <script>
+                    
+                    $(document).ready(function () {
+                        //setting text alignment | English - Urdu - Arabic
+                        setAlignment(@postID);
 
-                    var text = document.getElementById("@postID");
-                    var ifUrduText = s => (/[\u0600-\u06FF]/.test(s[0]));
+                        //calling api to translate
+                        $('#urdu-btn-@postID').click(function () {
+                            translate('ur', @postID);
+                        });
+                        $('#arabic-btn-@postID').click(function () {
+                            translate('ar', @postID);
+                        });
+                        $('#english-btn-@postID').click(function () {
+                            translate('en', @postID);
+                        });
+                    });
 
-                     if (ifUrduText(text.innerText.replace(/[^a-zA-Z \u0600-\u06FF ]/g, '').trim())) {
-
-                         text.classList.add("userPost")
-                    }
                 </script>
+
             }
         }
 
     </div>
 </div>
 
+// Translator
+
+<script>
+    function translate(target_language, postID) {
+        var text = $('#' + postID).text();
+        $.ajax({
+            url: 'http://127.0.0.1:5000/api/translate',
+            type: 'POST',
+            data: JSON.stringify({ text: text, language: target_language }),
+            contentType: 'application/json; charset=utf-8',
+            headers: {
+                "contentType": "application/json"
+            },
+            success: function (response) {
+                $('#' + postID).text(response.translation);
+                //setting text alignment | English - Urdu - Arabic
+                setAlignment(postID);
+            },
+            error: function (xhr) {
+                console.log(xhr.responseText);
+            }
+        });
+    }
+
+    //setting text alignment | English - Urdu - Arabic
+    function setAlignment(postID) {
+        var text = document.getElementById(postID);
+        var ifUrduText = s => (/[\u0600-\u06FF]/.test(s[0]));
+
+        if (ifUrduText(text.innerText.replace(/[^a-zA-Z \u0600-\u06FF ]/g, '').trim())) {
+
+            text.classList.add("postUrAr")
+        }
+        else {
+            text.classList.remove("postUrAr")
+        }
+    }
+</script>

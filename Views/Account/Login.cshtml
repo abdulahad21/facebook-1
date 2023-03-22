@@ -2,30 +2,29 @@
 @{ ViewData["Title"] = "Login"; }
 
 
-<h4 class="mt-5 text-center">Login to Facebook</h4>
-
-<hr />
 
 
 <form asp-action="Login" method="post">
 
-    <div class="row">
+    <div class="row justify-content-between mt-5">
 
         <div class="col-md-6">
             <img class="" width="301" height="106" src="https://static.xx.fbcdn.net/rsrc.php/y8/r/dF5SId3UHWd.svg" alt="Facebook">
-            <h5>Facebook helps you connect and share with the people in your life.</h5>
+            <h5 class="ml-4 pl-2">Facebook helps you connect and share with the people in your life.</h5>
         </div>
 
-        <div class="col-md-6">
+        <div class="col-md-4 bg-white shadow p-3 rounded-4">
+            <h4 class="text-center">Login to Facebook</h4>
+            <hr>
             <div class="form-group">
                 <label asp-for="Email" class="control-label"></label>
-                <input asp-for="Email" class="form-control" />
+                <input asp-for="Email" class="form-control" placeholder="Enter Email Address" />
                 <span asp-validation-for="Email" class="text-danger"></span>
             </div>
 
             <div class="form-group">
                 <label asp-for="Password" class="control-label"></label>
-                <input asp-for="Password" class="form-control" />
+                <input asp-for="Password" class="form-control" placeholder="Enter Password" />
                 <span asp-validation-for="Password" class="text-danger"></span>
             </div>
 
@@ -40,7 +39,7 @@
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
             <div class="form-group text-center">
-                <input type="submit" value="Login" class="btn btn-block btn-primary login-button" />
+                <input type="submit" value="Login" class="btn btn-block btn-primary login-button rounded-pill" />
             </div>
 
             <div class="text-center">

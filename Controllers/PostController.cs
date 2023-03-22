@@ -38,6 +38,7 @@ namespace Facebook.Controllers
         public async Task<IActionResult> UserPost(PostModel userPost, IFormFile image)
         {
             var currentUser = _userManager.FindByNameAsync(User.Identity.Name).Result;
+            var url = Request.Headers["Referer"];
 
             userPost.FirstName = currentUser.FirstName;
             userPost.LastName = currentUser.LastName;
@@ -46,62 +47,73 @@ namespace Facebook.Controllers
 
             if (image != null)
             {
-                byte[] imageBytes = GetImageBytes(image);
-
-                // Create an HTTP client and set the content type to image/jpeg
-                HttpClient client = new HttpClient();
-                // Create a new HttpRequestMessage
-                var request = new HttpRequestMessage(HttpMethod.Post, "http://127.0.0.1:5000/api/face_detection");
-
-                // Create an HttpContent object representing the image data and set the Content-Type header
-                var content = new ByteArrayContent(imageBytes);
-                content.Headers.ContentType = new MediaTypeHeaderValue("image/jpeg");
-
-                // Set the request's Content property to the HttpContent object
-                request.Content = content;
-
-                var response = await client.SendAsync(request);
-
-                // Read the response from the API
-                var responseString = await response.Content.ReadAsStringAsync();
-
-                // Deserialize the JSON response
-                var responseMsg = JsonConvert.DeserializeObject<ResponseMsg>(responseString);
-                string resMsg = responseMsg.Result;
-                int code = responseMsg.Code;
-
-                if (response.IsSuccessStatusCode)
+                try
                 {
-                    if (code == 0)
-                    {
-                        // Upload image to any cload Storage
-                        // Save Image Path to Database
-                        string folder = "Images/";
-                        folder += Guid.NewGuid().ToString() + "_" + image.FileName;
+                    byte[] imageBytes = GetImageBytes(image);
 
-                        using (var stream = new FileStream(folder, FileMode.Create))
+                    // Create an HTTP client and set the content type to image/jpeg
+                    HttpClient client = new HttpClient();
+                    // Create a new HttpRequestMessage
+                    var request = new HttpRequestMessage(HttpMethod.Post, "http://127.0.0.1:5000/api/face_detection");
+
+                    // Create an HttpContent object representing the image data and set the Content-Type header
+                    var content = new ByteArrayContent(imageBytes);
+                    content.Headers.ContentType = new MediaTypeHeaderValue("image/jpeg");
+
+                    // Set the request's Content property to the HttpContent object
+                    request.Content = content;
+
+                    var response = await client.SendAsync(request);
+
+                    // Read the response from the API
+                    var responseString = await response.Content.ReadAsStringAsync();
+
+                    // Deserialize the JSON response
+                    var responseMsg = JsonConvert.DeserializeObject<ResponseMsg>(responseString);
+                    string resMsg = responseMsg.Result;
+                    int code = responseMsg.Code;
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        if (code == 0)
                         {
-                            await image.CopyToAsync(stream);
+                            // Upload image to wwwroot/Images
+                            // Save Image Path to Database
+                            var fileName = Path.GetFileName(image.FileName);
+                            var path = Path.Combine(
+                                Directory.GetCurrentDirectory(), "wwwroot", "Images", fileName);
+                            using (var stream = new FileStream(path, FileMode.Create))
+                            {
+                                image.CopyTo(stream);
+                            }
+
+                            var imagePath = "/Images/" + fileName;
+                            userPost.ImagePath = imagePath;
+                            userPost.ImageName = fileName;
                         }
-                        userPost.File_Path = folder;
+                        else
+                        {
+                            // Use this message to warn this user that image contains faces
+                            TempData["Warning"] = resMsg;
+                            return Redirect(url);
+                        }
                     }
                     else
                     {
-                        // Use this message to warn this user that image contains faces
                         TempData["Warning"] = resMsg;
+                        return Redirect(url);
                     }
                 }
-                else
+                catch (Exception ex)
                 {
-                    TempData["Error"] = resMsg;
+                    TempData["Warning"] = ex.Message;
+                    return Redirect(url);
                 }
 
             }
 
             _postContext.Add(userPost);
             await _postContext.SaveChangesAsync();
-
-            var url = Request.Headers["Referer"];
 
             return Redirect(url);
         }
